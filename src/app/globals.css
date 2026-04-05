@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Colors */
+  --color-primary: #213E80;
+  --color-accent: #F88F24;
+  --color-accent-tint: rgba(248, 143, 36, 0.1);
+  --color-success: #22C55E;
+  --color-success-light: #DCFCE7;
+  --color-feature-green: #238B57;
+  --color-feature-green-tint: rgba(45, 180, 112, 0.1);
+  --color-whatsapp: #25D366;
+  --color-text-dark: #171D26;
+  --color-text-heading: #080807;
+  --color-text-muted: #6C7889;
+  --color-bg-alt: #F8FAFC;
+  --color-border: #E0E5EB;
+  --color-growth-bg: rgba(11, 100, 244, 0.02);
+  --color-hero-circle-blue: rgba(11, 100, 244, 0.05);
+  --color-hero-circle-orange: rgba(248, 143, 36, 0.05);
+  --color-navbar-bg: rgba(255, 255, 255, 0.8);
+
+  /* Fonts */
+  --font-heading: var(--font-dm-sans);
+  --font-body: var(--font-inter);
+
+  /* Border radius */
+  --radius-card: 12px;
+  --radius-button: 8px;
+  --radius-pill: 9999px;
+}
+
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  color: var(--color-text-dark);
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), system-ui, sans-serif;
+}
