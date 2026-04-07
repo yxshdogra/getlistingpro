@@ -6,7 +6,7 @@ Conversion-focused landing page for ListingPro, a content creation service for I
 
 - **Next.js 16** (App Router, TypeScript)
 - **Tailwind CSS v4** (CSS-first config via `@theme` in `globals.css`)
-- **Razorpay** (Orders API with server-side signature verification)
+- **Razorpay** (Subscriptions API with server-side signature verification)
 - **Meta Pixel** (PageView, InitiateCheckout, Purchase events)
 
 ## Local Development
@@ -29,10 +29,10 @@ npm start       # Production server on port 3000
 | Path | Description |
 |---|---|
 | `/` | Landing page |
-| `/thank-you?order_id=X&plan=Y&amount=Z` | Payment success (after server-verified payment) |
+| `/thank-you?subscription_id=X&plan=Y&amount=Z` | Payment success (after server-verified payment) |
 | `/payment-failed?plan=Y` | Payment failure with retry |
-| `/api/create-order` | POST — creates Razorpay order |
-| `/api/verify-payment` | POST — verifies Razorpay signature (HMAC SHA256) |
+| `/api/create-subscription` | POST — creates Razorpay subscription |
+| `/api/verify-payment` | POST — verifies Razorpay subscription signature (HMAC SHA256) |
 
 ## Environment Variables
 

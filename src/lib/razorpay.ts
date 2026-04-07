@@ -8,11 +8,9 @@ declare global {
 
 interface RazorpayOptions {
   key: string;
-  amount: number;
-  currency: string;
+  subscription_id: string;
   name: string;
   description: string;
-  order_id: string;
   handler: (response: RazorpayResponse) => void;
   prefill?: { contact?: string; email?: string };
   theme?: { color?: string };
@@ -25,7 +23,7 @@ interface RazorpayInstance {
 
 interface RazorpayResponse {
   razorpay_payment_id: string;
-  razorpay_order_id: string;
+  razorpay_subscription_id: string;
   razorpay_signature: string;
 }
 
@@ -47,31 +45,29 @@ export async function initiateCheckout(planId: string) {
   const plan = getPlanById(planId);
   if (!plan) throw new Error(`Plan not found: ${planId}`);
 
-  // 1. Create order on server
-  const res = await fetch("/api/create-order", {
+  // 1. Create subscription on server
+  const res = await fetch("/api/create-subscription", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ planId }),
   });
 
   if (!res.ok) {
-    throw new Error("Failed to create order");
+    throw new Error("Failed to create subscription");
   }
 
-  const { orderId, keyId } = await res.json();
+  const { subscriptionId, keyId } = await res.json();
 
   // 2. Load Razorpay script
   await loadRazorpayScript();
 
-  // 3. Open checkout
+  // 3. Open checkout with subscription
   return new Promise<void>((resolve, reject) => {
     const options: RazorpayOptions = {
       key: keyId,
-      amount: plan.amount,
-      currency: "INR",
+      subscription_id: subscriptionId,
       name: "ListingPro",
       description: `${plan.name} Plan — ${plan.amountDisplay}${plan.period}`,
-      order_id: orderId,
       handler: async (response: RazorpayResponse) => {
         try {
           // 4. Verify payment on server
@@ -79,7 +75,7 @@ export async function initiateCheckout(planId: string) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
+              razorpay_subscription_id: response.razorpay_subscription_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               planId,

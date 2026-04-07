@@ -14,7 +14,7 @@ const nextSteps = [
       </svg>
     ),
     title: "What happens next?",
-    description: "We'll review your order and get started right away.",
+    description: "We'll review your subscription and get started right away.",
   },
   {
     icon: (
@@ -40,16 +40,16 @@ export default function ThankYouContent() {
   const searchParams = useSearchParams();
   const plan = searchParams.get("plan") || "starter";
   const amount = searchParams.get("amount") || "₹10,000";
-  const orderId = searchParams.get("order_id") || "";
+  const subscriptionId = searchParams.get("subscription_id") || "";
 
   const planName = plan.charAt(0).toUpperCase() + plan.slice(1);
 
   useEffect(() => {
     const planData = getPlanById(plan);
-    if (planData && orderId) {
-      trackPurchase(plan, planData.amount / 100, orderId);
+    if (planData && subscriptionId) {
+      trackPurchase(plan, planData.amount / 100, subscriptionId);
     }
-  }, [plan, orderId]);
+  }, [plan, subscriptionId]);
 
   return (
     <>
@@ -75,8 +75,8 @@ export default function ThankYouContent() {
       </h1>
       <p className="text-sm leading-6 text-text-muted mb-8">
         Your {planName} Plan ({amount}/month) is now active.
-        {orderId && (
-          <span className="block text-xs mt-1">Order ID: {orderId}</span>
+        {subscriptionId && (
+          <span className="block text-xs mt-1">Subscription ID: {subscriptionId}</span>
         )}
       </p>
 

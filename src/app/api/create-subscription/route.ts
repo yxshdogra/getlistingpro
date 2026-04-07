@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
-import { getPlanById } from "@/lib/constants";
+import { getPlanById, SUBSCRIPTION_TOTAL_COUNT } from "@/lib/constants";
 
 function getRazorpay() {
   return new Razorpay({
@@ -32,24 +32,23 @@ export async function POST(request: Request) {
     }
 
     const razorpay = getRazorpay();
-    const order = await razorpay.orders.create({
-      amount: plan.amount,
-      currency: "INR",
-      receipt: `receipt_${plan.id}_${Date.now()}`,
+    const subscription = await razorpay.subscriptions.create({
+      plan_id: plan.razorpayPlanId,
+      total_count: SUBSCRIPTION_TOTAL_COUNT,
+      quantity: 1,
+      customer_notify: 1,
     });
 
     return NextResponse.json({
-      orderId: order.id,
-      amount: plan.amount,
+      subscriptionId: subscription.id,
       planId: plan.id,
       planName: plan.name,
       keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    // Sanitize logged errors — don't log full error objects
-    console.error("Create order error:", error instanceof Error ? error.message : "Unknown error");
+    console.error("Create subscription error:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json(
-      { error: "Failed to create order" },
+      { error: "Failed to create subscription" },
       { status: 500 }
     );
   }

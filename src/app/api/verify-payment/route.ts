@@ -12,15 +12,15 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId } = body;
+    const { razorpay_subscription_id, razorpay_payment_id, razorpay_signature, planId } = body;
 
     // Input validation: all fields must be strings with expected formats
     if (
       typeof planId !== "string" ||
-      typeof razorpay_order_id !== "string" ||
+      typeof razorpay_subscription_id !== "string" ||
       typeof razorpay_payment_id !== "string" ||
       typeof razorpay_signature !== "string" ||
-      !razorpay_order_id.startsWith("order_") ||
+      !razorpay_subscription_id.startsWith("sub_") ||
       !razorpay_payment_id.startsWith("pay_") ||
       razorpay_signature.length !== 64 ||
       !/^[a-f0-9]{64}$/.test(razorpay_signature)
@@ -33,8 +33,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
-    // Verify HMAC SHA256 signature using timing-safe comparison
-    const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
+    // Verify HMAC SHA256 signature: payload is payment_id|subscription_id for subscriptions
+    const payload = `${razorpay_payment_id}|${razorpay_subscription_id}`;
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
       .update(payload)
@@ -47,17 +47,16 @@ export async function POST(request: Request) {
     );
 
     if (verified) {
-      // Sanitize order ID before including in redirect URL
-      const safeOrderId = razorpay_order_id.replace(/[^a-zA-Z0-9_]/g, "");
+      // Sanitize subscription ID before including in redirect URL
+      const safeSubscriptionId = razorpay_subscription_id.replace(/[^a-zA-Z0-9_]/g, "");
       return NextResponse.json({
         verified: true,
-        redirectUrl: `/thank-you?order_id=${safeOrderId}&plan=${plan.id}&amount=${plan.amountDisplay}`,
+        redirectUrl: `/thank-you?subscription_id=${safeSubscriptionId}&plan=${plan.id}&amount=${plan.amountDisplay}`,
       });
     }
 
     return NextResponse.json({ verified: false }, { status: 400 });
   } catch (error) {
-    // Sanitize logged errors — don't log full error objects
     console.error("Verify payment error:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json(
       { error: "Verification failed" },
