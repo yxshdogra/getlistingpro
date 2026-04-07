@@ -4,11 +4,15 @@ import { getPlanById } from "@/lib/constants";
 
 export async function POST(request: Request) {
   try {
-    // CSRF: Validate Origin header
+    // CSRF: Validate Origin header (accept both www and non-www)
     const origin = request.headers.get("origin");
     const allowedOrigin = process.env.NEXT_PUBLIC_SITE_BASE_URL;
-    if (allowedOrigin && origin && origin !== allowedOrigin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (allowedOrigin && origin) {
+      const allowed = new URL(allowedOrigin).hostname.replace(/^www\./, "");
+      const incoming = new URL(origin).hostname.replace(/^www\./, "");
+      if (allowed !== incoming) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
     }
 
     const body = await request.json();
