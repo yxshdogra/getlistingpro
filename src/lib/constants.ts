@@ -66,6 +66,31 @@ export const PLANS: Plan[] = [
   },
 ];
 
+export const TEST_PLANS: Plan[] = [
+  {
+    id: "test-monthly",
+    name: "Test Monthly",
+    amount: 400,
+    amountDisplay: "₹4",
+    period: "/month",
+    description: "Test plan — ₹4/month",
+    popular: false,
+    razorpayPlanId: "plan_S6SWalB73bEuia",
+    features: ["Payment flow test"],
+  },
+  {
+    id: "test-yearly",
+    name: "Test Yearly",
+    amount: 500,
+    amountDisplay: "₹5",
+    period: "/year",
+    description: "Test plan — ₹5/year",
+    popular: false,
+    razorpayPlanId: "plan_S6SWrfPil7qS6p",
+    features: ["Payment flow test"],
+  },
+];
+
 export function getPlanById(id: string): Plan | undefined {
-  return PLANS.find((p) => p.id === id);
+  return PLANS.find((p) => p.id === id) || TEST_PLANS.find((p) => p.id === id);
 }
