@@ -21,22 +21,25 @@ function CheckIcon() {
 
 export default function PricingCard({
   plan,
+  isHighlighted,
   onSelect,
+  onHover,
 }: {
   plan: Plan;
+  isHighlighted: boolean;
   onSelect: (planId: string) => void;
+  onHover: () => void;
 }) {
-  const isPopular = plan.popular;
-
   return (
     <div
-      className={`relative flex flex-col rounded-card p-6 ${
-        isPopular
+      className={`relative flex flex-col rounded-card p-6 transition-all duration-200 ${
+        isHighlighted
           ? "bg-growth-bg border border-primary shadow-[0px_1px_2px_rgba(0,0,0,0.05)]"
           : "bg-bg-alt border border-border"
       }`}
+      onMouseEnter={onHover}
     >
-      {isPopular && (
+      {plan.popular && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-semibold leading-4 px-3 py-1 rounded-pill">
           Most Popular
         </span>
@@ -68,7 +71,7 @@ export default function PricingCard({
       </ul>
 
       <Button
-        variant={isPopular ? "primary" : "outlined"}
+        variant={isHighlighted ? "primary" : "outlined"}
         fullWidth
         onClick={() => onSelect(plan.id)}
       >

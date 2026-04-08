@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PLANS, getPlanById } from "@/lib/constants";
 import { initiateCheckout } from "@/lib/razorpay";
 import { trackInitiateCheckout, trackViewContent } from "@/lib/pixel";
@@ -11,6 +11,7 @@ import PricingCard from "./PricingCard";
 export default function PricingSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const hasTrackedView = useRef(false);
+  const [hoveredPlanId, setHoveredPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -51,14 +52,26 @@ export default function PricingSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
-          {PLANS.map((plan) => (
-            <PricingCard
-              key={plan.id}
-              plan={plan}
-              onSelect={handleSelectPlan}
-            />
-          ))}
+        <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto"
+          onMouseLeave={() => setHoveredPlanId(null)}
+        >
+          {PLANS.map((plan) => {
+            // If nothing is hovered, the popular plan is highlighted
+            // If a plan is hovered, only that plan is highlighted
+            const isHighlighted =
+              hoveredPlanId === null ? plan.popular : hoveredPlanId === plan.id;
+
+            return (
+              <PricingCard
+                key={plan.id}
+                plan={plan}
+                isHighlighted={isHighlighted}
+                onSelect={handleSelectPlan}
+                onHover={() => setHoveredPlanId(plan.id)}
+              />
+            );
+          })}
         </div>
       </Container>
     </section>

@@ -45,7 +45,7 @@ export default function Hero() {
               <p className="text-xs font-semibold uppercase tracking-[0.7px] text-text-muted mb-4">
                 Works with top marketplaces
               </p>
-              <div className="flex items-center gap-4 sm:gap-6 justify-center lg:justify-start flex-wrap">
+              <div className="flex items-center gap-4 sm:gap-6 justify-center lg:justify-start">
                 {[
                   { name: "Amazon", src: "/images/logos/Amazon_logo.svg", w: 90, h: 28, cls: "h-5 sm:h-7 w-auto" },
                   { name: "Flipkart", src: "/images/logos/Flipkart-Logo.wine.svg", w: 100, h: 30, cls: "h-7 sm:h-9 w-auto" },
