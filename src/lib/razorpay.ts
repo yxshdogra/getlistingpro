@@ -85,6 +85,10 @@ export async function initiateCheckout(planId: string) {
           const data = await verifyRes.json();
 
           if (data.verified && typeof data.redirectUrl === "string" && data.redirectUrl.startsWith("/")) {
+            // Store subscription ID in sessionStorage for the thank-you page (not in URL)
+            if (data.subscriptionId) {
+              sessionStorage.setItem("lp_subscription_id", data.subscriptionId);
+            }
             window.location.href = data.redirectUrl;
           } else if (!data.verified) {
             window.location.href = `/payment-failed?plan=${planId}`;

@@ -33,17 +33,20 @@ function StepNumber({ n }: { n: number }) {
 export default function ThankYouContent() {
   const searchParams = useSearchParams();
   const planId = searchParams.get("plan") || "starter";
-  const amount = searchParams.get("amount") || "₹10,000";
-  const subscriptionId = searchParams.get("subscription_id") || "";
 
   const plan = getPlanById(planId);
   const planName = plan?.name || planId.charAt(0).toUpperCase() + planId.slice(1);
+  const amount = plan?.amountDisplay || "₹10,000";
+  const period = plan?.period || "/month";
 
   useEffect(() => {
+    // Read subscription ID from sessionStorage (not from URL for privacy)
+    const subscriptionId = sessionStorage.getItem("lp_subscription_id") || "";
     if (plan && subscriptionId) {
       trackPurchase(planId, plan.amount / 100, subscriptionId);
+      sessionStorage.removeItem("lp_subscription_id");
     }
-  }, [planId, plan, subscriptionId]);
+  }, [planId, plan]);
 
   return (
     <div className="w-full max-w-xl mx-auto">
@@ -84,18 +87,12 @@ export default function ThankYouContent() {
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-text-muted">Amount</span>
-            <span className="text-sm font-semibold text-text-dark">{amount}/month</span>
+            <span className="text-sm font-semibold text-text-dark">{amount}{period}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-text-muted">Billing cycle</span>
             <span className="text-sm font-semibold text-text-dark">12 months</span>
           </div>
-          {subscriptionId && (
-            <div className="flex justify-between items-center pt-3 border-t border-border">
-              <span className="text-sm text-text-muted">Subscription ID</span>
-              <span className="text-xs font-mono text-text-muted">{subscriptionId}</span>
-            </div>
-          )}
         </div>
       </div>
 

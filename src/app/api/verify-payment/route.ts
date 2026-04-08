@@ -51,11 +51,12 @@ export async function POST(request: Request) {
     );
 
     if (verified) {
-      // Sanitize subscription ID before including in redirect URL
+      // Sanitize subscription ID (returned separately, not in the URL)
       const safeSubscriptionId = razorpay_subscription_id.replace(/[^a-zA-Z0-9_]/g, "");
       return NextResponse.json({
         verified: true,
-        redirectUrl: `/thank-you?subscription_id=${safeSubscriptionId}&plan=${plan.id}&amount=${plan.amountDisplay}`,
+        subscriptionId: safeSubscriptionId,
+        redirectUrl: `/thank-you?plan=${plan.id}`,
       });
     }
 
