@@ -21,7 +21,8 @@ export const PLANS: Plan[] = [
     period: "/month",
     description: "Ideal for beginners in professional content",
     popular: false,
-    razorpayPlanId: "plan_SJbbn4Xakqbga6",
+    // TEMP: using test plan ID (₹4/mo) for payment testing — revert to plan_SJbbn4Xakqbga6
+    razorpayPlanId: "plan_S6SWalB73bEuia",
     features: [
       "5 AI model product photos",
       "2 short-form reels",
@@ -37,7 +38,8 @@ export const PLANS: Plan[] = [
     period: "/month",
     description: "For sellers ready to scale their visibility and orders",
     popular: true,
-    razorpayPlanId: "plan_SJbcTvn6KTlsYN",
+    // TEMP: using test plan ID (₹5/yr) for payment testing — revert to plan_SJbcTvn6KTlsYN
+    razorpayPlanId: "plan_S6SWrfPil7qS6p",
     features: [
       "15 AI model product photos",
       "5 short-form reels",
@@ -54,7 +56,8 @@ export const PLANS: Plan[] = [
     period: "/month",
     description: "For established sellers who want maximum growth",
     popular: false,
-    razorpayPlanId: "plan_SJbd3RuELBzJkA",
+    // TEMP: using test plan ID (₹4/mo) for payment testing — revert to plan_SJbd3RuELBzJkA
+    razorpayPlanId: "plan_S6SWalB73bEuia",
     features: [
       "30 AI model product photos",
       "10 short-form reels",
