@@ -11,7 +11,13 @@
       "Bash(npx create-next-app@latest:*)",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:abhishek-gupta.medium.com)",
+      "Bash(npm run build:*)",
+      "Bash(git push:*)",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__plugin_playwright_playwright__browser_evaluate"
     ]
   }
 }
