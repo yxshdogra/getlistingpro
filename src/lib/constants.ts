@@ -14,6 +14,17 @@ export const SUBSCRIPTION_TOTAL_COUNT = 12; // 12 billing cycles (1 year)
 
 export const PLANS: Plan[] = [
   {
+    id: "test-monthly",
+    name: "Test Monthly",
+    amount: 400,
+    amountDisplay: "₹4",
+    period: "/month",
+    description: "Test plan — ₹4/month",
+    popular: false,
+    razorpayPlanId: "plan_S6SWalB73bEuia",
+    features: ["Payment flow test"],
+  },
+  {
     id: "starter",
     name: "Starter",
     amount: 500000,
@@ -21,8 +32,7 @@ export const PLANS: Plan[] = [
     period: "/month",
     description: "Ideal for beginners in professional content",
     popular: false,
-    // TEMP: using test plan ID (₹4/mo) for payment testing — revert to plan_SJbbn4Xakqbga6
-    razorpayPlanId: "plan_S6SWalB73bEuia",
+    razorpayPlanId: "plan_SJbbn4Xakqbga6",
     features: [
       "5 AI model product photos",
       "2 short-form reels",
@@ -38,8 +48,7 @@ export const PLANS: Plan[] = [
     period: "/month",
     description: "For sellers ready to scale their visibility and orders",
     popular: true,
-    // TEMP: using test plan ID (₹5/yr) for payment testing — revert to plan_SJbcTvn6KTlsYN
-    razorpayPlanId: "plan_S6SWrfPil7qS6p",
+    razorpayPlanId: "plan_SJbcTvn6KTlsYN",
     features: [
       "15 AI model product photos",
       "5 short-form reels",
@@ -56,8 +65,7 @@ export const PLANS: Plan[] = [
     period: "/month",
     description: "For established sellers who want maximum growth",
     popular: false,
-    // TEMP: using test plan ID (₹4/mo) for payment testing — revert to plan_SJbd3RuELBzJkA
-    razorpayPlanId: "plan_S6SWalB73bEuia",
+    razorpayPlanId: "plan_SJbd3RuELBzJkA",
     features: [
       "30 AI model product photos",
       "10 short-form reels",
@@ -66,20 +74,6 @@ export const PLANS: Plan[] = [
       "Dedicated account manager",
       "Catalogue design",
     ],
-  },
-];
-
-export const TEST_PLANS: Plan[] = [
-  {
-    id: "test-monthly",
-    name: "Test Monthly",
-    amount: 400,
-    amountDisplay: "₹4",
-    period: "/month",
-    description: "Test plan — ₹4/month",
-    popular: false,
-    razorpayPlanId: "plan_S6SWalB73bEuia",
-    features: ["Payment flow test"],
   },
   {
     id: "test-yearly",
@@ -95,5 +89,5 @@ export const TEST_PLANS: Plan[] = [
 ];
 
 export function getPlanById(id: string): Plan | undefined {
-  return PLANS.find((p) => p.id === id) || TEST_PLANS.find((p) => p.id === id);
+  return PLANS.find((p) => p.id === id);
 }
