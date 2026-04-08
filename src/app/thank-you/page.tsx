@@ -1,6 +1,7 @@
 import { Suspense } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import Container from "@/components/ui/Container";
-import Button from "@/components/ui/Button";
 import ThankYouContent from "./ThankYouContent";
 
 export const metadata = {
@@ -9,12 +10,16 @@ export const metadata = {
 
 export default function ThankYouPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center py-16">
-      <Container className="max-w-lg text-center">
-        <Suspense fallback={<div className="animate-pulse h-96" />}>
-          <ThankYouContent />
-        </Suspense>
-      </Container>
-    </main>
+    <>
+      <Navbar />
+      <main className="min-h-screen pt-24 pb-16">
+        <Container>
+          <Suspense fallback={<div className="animate-pulse h-96" />}>
+            <ThankYouContent />
+          </Suspense>
+        </Container>
+      </main>
+      <Footer />
+    </>
   );
 }
