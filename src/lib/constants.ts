@@ -37,7 +37,7 @@ export const PLANS: Plan[] = [
       "5 AI model product photos",
       "2 short-form reels",
       "5 SEO-optimized listings",
-      "WhatsApp support",
+      "Dedicated support",
     ],
   },
   {
@@ -54,7 +54,7 @@ export const PLANS: Plan[] = [
       "5 short-form reels",
       "15 SEO-optimized listings",
       "Brand logo design",
-      "Priority WhatsApp support",
+      "Priority support",
     ],
   },
   {

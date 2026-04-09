@@ -21,10 +21,10 @@ export default function Footer() {
             How It Works
           </a>
           <a
-            href={process.env.NEXT_PUBLIC_WHATSAPP_ONBOARDING_URL || "#"}
+            href="#"
             className="text-xs leading-4 text-text-muted hover:text-text-dark transition-colors"
           >
-            WhatsApp
+            Contact
           </a>
         </div>
         <p className="text-xs leading-4 text-text-muted">

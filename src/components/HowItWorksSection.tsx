@@ -10,7 +10,7 @@ const steps = [
   {
     number: "2",
     title: "Share Your Products",
-    description: "Send us your product details on WhatsApp.",
+    description: "Send us your product details and brand info.",
   },
   {
     number: "3",
