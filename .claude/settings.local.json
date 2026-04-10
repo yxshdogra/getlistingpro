@@ -17,7 +17,9 @@
       "Bash(npm run build:*)",
       "Bash(git push:*)",
       "mcp__Claude_Preview__preview_start",
-      "mcp__plugin_playwright_playwright__browser_evaluate"
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(lsof -i :3000 -t)",
+      "Bash(kill 988 32406)"
     ]
   }
 }
