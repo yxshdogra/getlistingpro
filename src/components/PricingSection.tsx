@@ -48,12 +48,13 @@ export default function PricingSection() {
             Choose your <span className="text-primary">plan</span>
           </h2>
           <p className="text-base leading-[26px] lg:text-lg lg:leading-7 text-text-muted mt-3 max-w-md mx-auto">
-            Choose a plan that fits your business. Cancel anytime.
+            Pick a plan and get fresh content every month. Cancel anytime.
           </p>
         </div>
 
+        {/* 2 live plans → 2-up centered grid. Switch to md:grid-cols-3 max-w-4xl when the intro plan is added. */}
         <div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-2xl mx-auto"
           onMouseLeave={() => setHoveredPlanId(null)}
         >
           {PLANS.map((plan) => {

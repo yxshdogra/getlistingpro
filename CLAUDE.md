@@ -41,6 +41,8 @@ npm start       # Production server on port 3000
 | `RAZORPAY_KEY_ID` | Server-side Razorpay key |
 | `RAZORPAY_KEY_SECRET` | Server-side Razorpay secret |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Client-side Razorpay key (same as above) |
+| `RAZORPAY_PLAN_ID_STARTER` | Razorpay plan ID for the Starter ₹499/mo subscription (defines the billed amount) |
+| `RAZORPAY_PLAN_ID_GROWTH` | Razorpay plan ID for the Growth ₹999/mo subscription (defines the billed amount) |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Meta/Facebook Pixel ID |
 | `NEXT_PUBLIC_WHATSAPP_ONBOARDING_URL` | WhatsApp deep link for onboarding |
 | `NEXT_PUBLIC_SITE_BASE_URL` | Production site URL |

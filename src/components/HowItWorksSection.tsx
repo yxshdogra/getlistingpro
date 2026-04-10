@@ -5,7 +5,7 @@ const steps = [
   {
     number: "1",
     title: "Choose Your Plan",
-    description: "Starter, Growth, or Scale — pick what fits your business.",
+    description: "Pick the plan that fits your business.",
   },
   {
     number: "2",
