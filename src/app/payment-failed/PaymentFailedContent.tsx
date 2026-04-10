@@ -7,9 +7,10 @@ import { getPlanById } from "@/lib/constants";
 
 export default function PaymentFailedContent() {
   const searchParams = useSearchParams();
-  const planId = searchParams.get("plan") || "starter";
-  const plan = getPlanById(planId);
-  const planName = plan?.name || planId.charAt(0).toUpperCase() + planId.slice(1);
+  const rawPlanId = searchParams.get("plan") || "";
+  const plan = getPlanById(rawPlanId);
+  const planId = plan?.id || "starter";
+  const planName = plan?.name || "Selected";
 
   const handleRetry = async () => {
     try {
