@@ -55,8 +55,9 @@ export async function POST(request: Request) {
       const safeSubscriptionId = razorpay_subscription_id.replace(/[^a-zA-Z0-9_]/g, "");
       return NextResponse.json({
         verified: true,
+        planId: plan.id,
         subscriptionId: safeSubscriptionId,
-        redirectUrl: `/thank-you?plan=${plan.id}`,
+        redirectUrl: "/thank-you",
       });
     }
 

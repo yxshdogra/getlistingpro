@@ -12,6 +12,9 @@ export type Plan = {
 
 export const SUBSCRIPTION_TOTAL_COUNT = 12; // 12 billing cycles (1 year)
 
+export const LP_PLAN_ID_STORAGE_KEY = "lp_plan_id";
+export const LP_SUBSCRIPTION_ID_STORAGE_KEY = "lp_subscription_id";
+
 export const PLANS: Plan[] = [
   {
     id: "test-monthly",

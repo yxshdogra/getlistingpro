@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import { trackPurchase } from "@/lib/pixel";
-import { getPlanById } from "@/lib/constants";
+import {
+  getPlanById,
+  LP_PLAN_ID_STORAGE_KEY,
+  LP_SUBSCRIPTION_ID_STORAGE_KEY,
+  type Plan,
+} from "@/lib/constants";
 
 function CheckIcon() {
   return (
@@ -31,22 +35,32 @@ function StepNumber({ n }: { n: number }) {
 }
 
 export default function ThankYouContent() {
-  const searchParams = useSearchParams();
-  const planId = searchParams.get("plan") || "starter";
-
-  const plan = getPlanById(planId);
-  const planName = plan?.name || planId.charAt(0).toUpperCase() + planId.slice(1);
-  const amount = plan?.amountDisplay || "₹10,000";
-  const period = plan?.period || "/month";
+  const [plan, setPlan] = useState<Plan | null>(null);
 
   useEffect(() => {
-    // Read subscription ID from sessionStorage (not from URL for privacy)
-    const subscriptionId = sessionStorage.getItem("lp_subscription_id") || "";
-    if (plan && subscriptionId) {
-      trackPurchase(planId, plan.amount / 100, subscriptionId);
-      sessionStorage.removeItem("lp_subscription_id");
+    // Read checkout context from sessionStorage (not from URL for privacy)
+    const storedPlanId = sessionStorage.getItem(LP_PLAN_ID_STORAGE_KEY);
+    const subscriptionId = sessionStorage.getItem(LP_SUBSCRIPTION_ID_STORAGE_KEY) || "";
+
+    // Always clear immediately to prevent stale data and duplicate tracking on refresh.
+    sessionStorage.removeItem(LP_PLAN_ID_STORAGE_KEY);
+    sessionStorage.removeItem(LP_SUBSCRIPTION_ID_STORAGE_KEY);
+
+    if (!storedPlanId) return;
+    const resolvedPlan = getPlanById(storedPlanId);
+    if (!resolvedPlan) return;
+    const setPlanTimer = window.setTimeout(() => {
+      setPlan(resolvedPlan);
+    }, 0);
+
+    if (subscriptionId) {
+      trackPurchase(resolvedPlan.id, resolvedPlan.amount / 100, subscriptionId);
     }
-  }, [planId, plan]);
+
+    return () => {
+      window.clearTimeout(setPlanTimer);
+    };
+  }, []);
 
   return (
     <div className="w-full max-w-xl mx-auto">
@@ -80,20 +94,26 @@ export default function ThankYouContent() {
         <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wide mb-4">
           Subscription Details
         </h2>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-text-muted">Plan</span>
-            <span className="text-sm font-semibold text-text-dark">{planName} Plan</span>
+        {plan ? (
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-text-muted">Plan</span>
+              <span className="text-sm font-semibold text-text-dark">{plan.name} Plan</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-text-muted">Amount</span>
+              <span className="text-sm font-semibold text-text-dark">{plan.amountDisplay}{plan.period}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-text-muted">Billing cycle</span>
+              <span className="text-sm font-semibold text-text-dark">12 months</span>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-text-muted">Amount</span>
-            <span className="text-sm font-semibold text-text-dark">{amount}{period}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-text-muted">Billing cycle</span>
-            <span className="text-sm font-semibold text-text-dark">12 months</span>
-          </div>
-        </div>
+        ) : (
+          <p className="text-sm leading-6 text-text-muted">
+            Your payment has been received and your subscription is active. We&apos;ll share onboarding details with you shortly.
+          </p>
+        )}
       </div>
 
       {/* What's included */}

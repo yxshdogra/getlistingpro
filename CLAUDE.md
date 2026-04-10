@@ -29,7 +29,7 @@ npm start       # Production server on port 3000
 | Path | Description |
 |---|---|
 | `/` | Landing page |
-| `/thank-you?subscription_id=X&plan=Y&amount=Z` | Payment success (after server-verified payment) |
+| `/thank-you` | Payment success (after server-verified payment) |
 | `/payment-failed?plan=Y` | Payment failure with retry |
 | `/api/create-subscription` | POST — creates Razorpay subscription |
 | `/api/verify-payment` | POST — verifies Razorpay subscription signature (HMAC SHA256) |
@@ -75,5 +75,6 @@ pm2 start npm --name listing-pro -- start
 
 - Razorpay amounts are in **paise** (₹10,000 = 1000000 paise)
 - Payment verification is stateless — no database needed
+- Thank-you plan/subscription context is passed via `sessionStorage`, not URL query params
 - Images are placeholders — drop actual assets into `public/images/`
 - Meta Pixel only loads when `NEXT_PUBLIC_META_PIXEL_ID` is set

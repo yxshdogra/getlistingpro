@@ -1,4 +1,8 @@
-import { getPlanById } from "./constants";
+import {
+  getPlanById,
+  LP_PLAN_ID_STORAGE_KEY,
+  LP_SUBSCRIPTION_ID_STORAGE_KEY,
+} from "./constants";
 
 declare global {
   interface Window {
@@ -25,6 +29,12 @@ interface RazorpayResponse {
   razorpay_payment_id: string;
   razorpay_subscription_id: string;
   razorpay_signature: string;
+}
+
+function clearCheckoutContext() {
+  if (typeof window === "undefined") return;
+  sessionStorage.removeItem(LP_PLAN_ID_STORAGE_KEY);
+  sessionStorage.removeItem(LP_SUBSCRIPTION_ID_STORAGE_KEY);
 }
 
 function loadRazorpayScript(): Promise<void> {
@@ -85,16 +95,23 @@ export async function initiateCheckout(planId: string) {
           const data = await verifyRes.json();
 
           if (data.verified && typeof data.redirectUrl === "string" && data.redirectUrl.startsWith("/")) {
-            // Store subscription ID in sessionStorage for the thank-you page (not in URL)
-            if (data.subscriptionId) {
-              sessionStorage.setItem("lp_subscription_id", data.subscriptionId);
+            clearCheckoutContext();
+
+            // Store checkout context in sessionStorage for the thank-you page (not in URL)
+            const resolvedPlanId = typeof data.planId === "string" ? data.planId : planId;
+            sessionStorage.setItem(LP_PLAN_ID_STORAGE_KEY, resolvedPlanId);
+
+            if (typeof data.subscriptionId === "string" && data.subscriptionId.length > 0) {
+              sessionStorage.setItem(LP_SUBSCRIPTION_ID_STORAGE_KEY, data.subscriptionId);
             }
             window.location.href = data.redirectUrl;
           } else if (!data.verified) {
+            clearCheckoutContext();
             window.location.href = `/payment-failed?plan=${planId}`;
           }
           resolve();
         } catch {
+          clearCheckoutContext();
           window.location.href = `/payment-failed?plan=${planId}`;
           reject();
         }
@@ -102,6 +119,7 @@ export async function initiateCheckout(planId: string) {
       theme: { color: "#213E80" },
       modal: {
         ondismiss: () => {
+          clearCheckoutContext();
           window.location.href = `/payment-failed?plan=${planId}`;
         },
       },
