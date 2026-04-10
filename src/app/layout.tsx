@@ -21,6 +21,12 @@ export const metadata: Metadata = {
   title: "ListingPro — Get More Orders with Better Content",
   description:
     "Increase product visibility and conversions with model shoots, viral reels, and SEO-optimized marketplace listings for Indian e-commerce sellers.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/icon.svg",
+  },
 };
 
 // Validate Pixel ID is numeric to prevent script injection via env tampering

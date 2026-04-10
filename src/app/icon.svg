@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+  <defs>
+    <!-- Deep navy to slightly lighter navy gradient for the background -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a3268"/>
+      <stop offset="100%" stop-color="#213E80"/>
+    </linearGradient>
+    <!-- Orange glow / accent gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFAB40"/>
+      <stop offset="100%" stop-color="#F88F24"/>
+    </linearGradient>
+    <!-- Subtle inner shadow filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="32" height="32" rx="7" fill="url(#bgGrad)"/>
+
+  <!-- Subtle top-left highlight shimmer -->
+  <rect width="32" height="32" rx="7" fill="url(#bgGrad)" opacity="0"/>
+  <ellipse cx="6" cy="5" rx="10" ry="6" fill="white" opacity="0.06"/>
+
+  <!-- "L" letterform — clean geometric sans -->
+  <!-- Vertical stroke of L -->
+  <rect x="5.5" y="8" width="3.5" height="16" rx="1" fill="white"/>
+  <!-- Horizontal foot of L -->
+  <rect x="5.5" y="20.5" width="9" height="3.5" rx="1" fill="white"/>
+
+  <!-- "P" letterform -->
+  <!-- Vertical spine of P -->
+  <rect x="16" y="8" width="3.5" height="16" rx="1" fill="white"/>
+  <!-- P bowl — top half arc approximated with a rounded rect -->
+  <rect x="16" y="8" width="7" height="8.5" rx="3.5" fill="white"/>
+  <!-- Punch out the interior of the P bowl -->
+  <rect x="18" y="10" width="4" height="5" rx="2" fill="url(#bgGrad)"/>
+
+  <!-- Accent mark: a sharp orange upward-right arrow / spark in bottom-right corner -->
+  <path d="M24.5 22 L28 19 L28 22.5 Z" fill="url(#accentGrad)" filter="url(#glow)"/>
+  <path d="M24.8 22.2 L28 19 L24.5 19.2Z" fill="url(#accentGrad)" opacity="0.6"/>
+  <!-- Accent dot under the arrow -->
+  <circle cx="26.8" cy="24.5" r="1.2" fill="url(#accentGrad)"/>
+</svg>
