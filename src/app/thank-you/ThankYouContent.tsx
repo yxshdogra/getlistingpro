@@ -42,23 +42,44 @@ export default function ThankYouContent() {
     const storedPlanId = sessionStorage.getItem(LP_PLAN_ID_STORAGE_KEY);
     const subscriptionId = sessionStorage.getItem(LP_SUBSCRIPTION_ID_STORAGE_KEY) || "";
 
-    // Always clear immediately to prevent stale data and duplicate tracking on refresh.
-    sessionStorage.removeItem(LP_PLAN_ID_STORAGE_KEY);
-    sessionStorage.removeItem(LP_SUBSCRIPTION_ID_STORAGE_KEY);
+    const clearContext = () => {
+      sessionStorage.removeItem(LP_PLAN_ID_STORAGE_KEY);
+      sessionStorage.removeItem(LP_SUBSCRIPTION_ID_STORAGE_KEY);
+    };
 
     if (!storedPlanId) return;
     const resolvedPlan = getPlanById(storedPlanId);
-    if (!resolvedPlan) return;
-    const setPlanTimer = window.setTimeout(() => {
-      setPlan(resolvedPlan);
-    }, 0);
+    if (!resolvedPlan) {
+      clearContext();
+      return;
+    }
+    setPlan(resolvedPlan);
 
-    if (subscriptionId) {
-      trackPurchase(resolvedPlan.id, resolvedPlan.amount / 100, subscriptionId);
+    if (!subscriptionId) {
+      clearContext();
+      return;
     }
 
+    // The pixel bootstraps afterInteractive (layout.tsx), so fbq may not exist
+    // yet when this effect runs. Retry until it fires, then clear the context
+    // so a refresh can't double-track. Give up after 10s (blocked pixel) —
+    // the server-side CAPI event is the backstop.
+    const deadline = Date.now() + 10_000;
+    let timerId: number | undefined;
+    const tryFire = () => {
+      if (
+        trackPurchase(resolvedPlan.id, resolvedPlan.amount / 100, subscriptionId) ||
+        Date.now() >= deadline
+      ) {
+        clearContext();
+        return;
+      }
+      timerId = window.setTimeout(tryFire, 200);
+    };
+    tryFire();
+
     return () => {
-      window.clearTimeout(setPlanTimer);
+      if (timerId !== undefined) window.clearTimeout(timerId);
     };
   }, []);
 

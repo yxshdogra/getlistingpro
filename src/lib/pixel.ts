@@ -32,17 +32,26 @@ export function trackInitiateCheckout(planId: string, value: number) {
   }
 }
 
+// Returns false when fbq hasn't bootstrapped yet so the caller can retry.
+// eventID (= subscription id) dedupes against the server-side CAPI Purchase.
 export function trackPurchase(
   planId: string,
   value: number,
   orderId: string
-) {
-  if (typeof window !== "undefined" && window.fbq) {
-    window.fbq("track", "Purchase", {
+): boolean {
+  if (typeof window === "undefined" || !window.fbq) {
+    return false;
+  }
+  window.fbq(
+    "track",
+    "Purchase",
+    {
       content_name: planId,
       value,
       currency: "INR",
       order_id: orderId,
-    });
-  }
+    },
+    { eventID: orderId }
+  );
+  return true;
 }
