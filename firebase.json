@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "site": "getlistingpro",
+    "public": "firebase-hosting",
+    "ignore": ["**/.*"],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "listingpro-web",
+          "region": "asia-south1"
+        }
+      }
+    ]
+  }
+}

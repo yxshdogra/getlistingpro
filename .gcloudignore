@@ -1,0 +1,18 @@
+# Controls what `gcloud builds submit` uploads. Secrets stay local:
+# NEXT_PUBLIC_* build values travel as Cloud Build substitutions, and
+# server secrets are set directly on the Cloud Run service.
+.env*
+
+/node_modules
+/.next
+/out
+/build
+/coverage
+.git
+.gitignore
+.vercel
+.claude
+*.log
+firebase-debug.log
+.DS_Store
+tsconfig.tsbuildinfo

@@ -1,0 +1,17 @@
+# Secrets must never enter the image (server env is set on the Cloud Run service)
+.env*
+
+node_modules
+.next
+out
+build
+coverage
+.git
+.vercel
+.claude
+*.log
+firebase-debug.log
+.DS_Store
+tsconfig.tsbuildinfo
+Dockerfile
+cloudbuild.yaml
