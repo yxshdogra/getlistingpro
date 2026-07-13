@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { getPlanById } from "@/lib/constants";
+import { readCookie, sendPurchaseCapiEvent } from "@/lib/meta-capi.server";
 
 export async function POST(request: Request) {
   try {
@@ -54,6 +55,22 @@ export async function POST(request: Request) {
     if (verified) {
       // Sanitize subscription ID (returned separately, not in the URL)
       const safeSubscriptionId = razorpay_subscription_id.replace(/[^a-zA-Z0-9_]/g, "");
+
+      // Server-side Purchase (dedupes with the browser pixel via event_id);
+      // after() runs post-response so the redirect is never delayed.
+      const cookieHeader = request.headers.get("cookie");
+      const capiInput = {
+        subscriptionId: safeSubscriptionId,
+        planId: plan.id,
+        value: plan.amount / 100,
+        clientIp: request.headers.get("x-forwarded-for")?.split(",")[0].trim(),
+        userAgent: request.headers.get("user-agent") ?? undefined,
+        fbp: readCookie(cookieHeader, "_fbp"),
+        fbc: readCookie(cookieHeader, "_fbc"),
+        eventSourceUrl: origin,
+      };
+      after(() => sendPurchaseCapiEvent(capiInput));
+
       return NextResponse.json({
         verified: true,
         planId: plan.id,
