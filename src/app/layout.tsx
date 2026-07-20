@@ -29,6 +29,11 @@ export const metadata: Metadata = {
   },
 };
 
+// Cap CDN caching at 5 minutes: prerendered pages otherwise ship
+// s-maxage=31536000, and the Firebase Hosting CDN would serve stale HTML
+// (old bundles, old pixel id) for up to a year after a deploy.
+export const revalidate = 300;
+
 // Validate Pixel ID is numeric to prevent script injection via env tampering
 const RAW_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const PIXEL_ID = RAW_PIXEL_ID && /^\d+$/.test(RAW_PIXEL_ID) ? RAW_PIXEL_ID : null;
