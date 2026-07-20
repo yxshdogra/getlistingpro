@@ -118,7 +118,28 @@ export async function initiateCheckout(planId: string) {
       },
       theme: { color: "#213E80" },
       modal: {
-        ondismiss: () => {
+        // UPI-AutoPay mandate approvals complete asynchronously in the user's
+        // UPI app, so the success handler may never run: the user dismisses
+        // the modal after approving. Check the real subscription status once
+        // before declaring failure. (Also covers ondismiss firing after a
+        // successful handler — status is authoritative either way.)
+        ondismiss: async () => {
+          try {
+            const res = await fetch(
+              `/api/subscription-status?id=${encodeURIComponent(subscriptionId)}`
+            );
+            if (res.ok) {
+              const { status } = await res.json();
+              if (status === "active" || status === "authenticated") {
+                sessionStorage.setItem(LP_PLAN_ID_STORAGE_KEY, planId);
+                sessionStorage.setItem(LP_SUBSCRIPTION_ID_STORAGE_KEY, subscriptionId);
+                window.location.href = "/thank-you";
+                return;
+              }
+            }
+          } catch {
+            // Status check unavailable — fall through to the failure page.
+          }
           clearCheckoutContext();
           window.location.href = `/payment-failed?plan=${planId}`;
         },

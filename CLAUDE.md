@@ -31,8 +31,10 @@ npm start       # Production server on port 3000
 | `/` | Landing page |
 | `/thank-you` | Payment success (after server-verified payment) |
 | `/payment-failed?plan=Y` | Payment failure with retry |
-| `/api/create-subscription` | POST — creates Razorpay subscription |
+| `/api/create-subscription` | POST — creates Razorpay subscription (stashes attribution context in notes) |
 | `/api/verify-payment` | POST — verifies Razorpay subscription signature (HMAC SHA256) |
+| `/api/razorpay-webhook` | POST — Razorpay `subscription.charged` webhook → server-side Meta Purchase (covers async UPI-AutoPay mandates + renewals the browser pixel never sees) |
+| `/api/subscription-status` | GET `?id=sub_…` — coarse status for the checkout ondismiss rescue (async mandate approvals) |
 
 ## Environment Variables
 
@@ -44,8 +46,9 @@ npm start       # Production server on port 3000
 | `RAZORPAY_PLAN_ID_STARTER` | Razorpay plan ID for the Starter ₹499/mo subscription (defines the billed amount) |
 | `RAZORPAY_PLAN_ID_GROWTH` | Razorpay plan ID for the Growth ₹999/mo subscription (defines the billed amount) |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Meta/Facebook Pixel ID |
-| `META_CAPI_ACCESS_TOKEN` | Optional — enables server-side Meta Purchase (Conversions API) from verify-payment; deduped with the browser pixel via `event_id` = subscription id |
+| `META_CAPI_ACCESS_TOKEN` | Optional — enables server-side Meta Purchase (Conversions API) from verify-payment and the Razorpay webhook; deduped with the browser pixel via `event_id` (subscription id for the first charge, payment id for renewals). Unset = skips are logged with `console.warn` |
 | `META_CAPI_TEST_EVENT_CODE` | Optional, verification only — routes server CAPI events to Events Manager → Test Events |
+| `RAZORPAY_WEBHOOK_SECRET` | Secret of the `subscription.charged` webhook endpoint registered in the Razorpay Dashboard (its own random string, NOT the key secret). Runtime-only on Cloud Run — never a build arg. Unset = webhook route ignores deliveries |
 | `NEXT_PUBLIC_WHATSAPP_ONBOARDING_URL` | WhatsApp deep link for onboarding |
 | `NEXT_PUBLIC_SITE_BASE_URL` | Production site URL |
 
@@ -82,7 +85,11 @@ gcloud builds submit --project jaatpride-05874 --config cloudbuild.yaml \
 gcloud run deploy listingpro-web --project jaatpride-05874 --region asia-south1 \
   --image asia-south1-docker.pkg.dev/jaatpride-05874/listingpro/listingpro-web:latest \
   --allow-unauthenticated --memory 512Mi \
-  --set-env-vars RAZORPAY_KEY_ID=...,RAZORPAY_KEY_SECRET=...,RAZORPAY_PLAN_ID_STARTER=...,RAZORPAY_PLAN_ID_GROWTH=...,NEXT_PUBLIC_SITE_BASE_URL=https://www.getlistingpro.com
+  --set-env-vars RAZORPAY_KEY_ID=...,RAZORPAY_KEY_SECRET=...,RAZORPAY_PLAN_ID_STARTER=...,RAZORPAY_PLAN_ID_GROWTH=...,RAZORPAY_WEBHOOK_SECRET=...,NEXT_PUBLIC_SITE_BASE_URL=https://www.getlistingpro.com
+
+# Add/rotate individual runtime secrets without a rebuild:
+gcloud run services update listingpro-web --project jaatpride-05874 --region asia-south1 \
+  --update-env-vars META_CAPI_ACCESS_TOKEN=...
 
 # Domain: Firebase Hosting rewrite → Cloud Run (firebase.json), custom domains
 # getlistingpro.com + www at GoDaddy DNS.

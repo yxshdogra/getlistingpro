@@ -60,7 +60,8 @@ export async function POST(request: Request) {
       // after() runs post-response so the redirect is never delayed.
       const cookieHeader = request.headers.get("cookie");
       const capiInput = {
-        subscriptionId: safeSubscriptionId,
+        eventId: safeSubscriptionId,
+        orderId: safeSubscriptionId,
         planId: plan.id,
         value: plan.amount / 100,
         clientIp: request.headers.get("x-forwarded-for")?.split(",")[0].trim(),

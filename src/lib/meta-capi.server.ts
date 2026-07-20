@@ -3,19 +3,40 @@
 // Inert until META_CAPI_ACCESS_TOKEN is set: generate one in Events Manager →
 // Data sources → the pixel → Settings → Conversions API, then set it on the
 // Cloud Run service. The event_id matches the browser pixel's eventID
-// (subscription id), so Meta dedupes the browser/server pair automatically.
+// (subscription id for the first charge), so Meta dedupes the browser/server
+// pair automatically; renewal charges use the payment id as event_id.
+
+import crypto from "crypto";
 
 const GRAPH_API_VERSION = "v21.0";
 
-interface PurchaseCapiInput {
-  subscriptionId: string;
+export interface PurchaseCapiInput {
+  /** Meta dedup key: subscription id for the first charge (pairs with the
+   *  browser pixel's eventID), payment id for renewals. */
+  eventId: string;
+  /** Subscription id, reported as custom_data.order_id. */
+  orderId: string;
   planId: string;
   value: number;
   clientIp?: string;
   userAgent?: string;
   fbp?: string;
   fbc?: string;
+  /** SHA-256 hex of the normalized (trimmed, lowercased) email. */
+  emailSha256?: string;
+  /** SHA-256 hex of the normalized (digits-only, with country code) phone. */
+  phoneSha256?: string;
   eventSourceUrl: string;
+}
+
+/** Meta requires PII match keys normalized then SHA-256 hashed. */
+export function sha256Lower(raw: string): string {
+  return crypto.createHash("sha256").update(raw.trim().toLowerCase()).digest("hex");
+}
+
+/** Razorpay `contact` is like "+919876543210"; Meta wants digits only, country code kept. */
+export function normalizePhone(raw: string): string {
+  return raw.replace(/\D/g, "");
 }
 
 export function readCookie(cookieHeader: string | null, name: string): string | undefined {
@@ -31,24 +52,34 @@ export async function sendPurchaseCapiEvent(input: PurchaseCapiInput): Promise<v
   const token = process.env.META_CAPI_ACCESS_TOKEN;
   const rawPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const pixelId = rawPixelId && /^\d+$/.test(rawPixelId) ? rawPixelId : null;
-  if (!token || !pixelId) return;
+  if (!token || !pixelId) {
+    console.warn(
+      `Meta CAPI skipped (${!token ? "no access token" : "no pixel id"}): Purchase ${input.eventId}`
+    );
+    return;
+  }
 
   // For action_source "website" Meta requires event_source_url and at least
   // one user_data identifier; client_ip_address + client_user_agent qualify
-  // and are sent raw (only PII fields like em/ph require hashing — none collected).
-  const userData: Record<string, string> = {};
+  // and are sent raw — only PII fields (em/ph) are hashed, upstream.
+  const userData: Record<string, string | string[]> = {};
   if (input.clientIp) userData.client_ip_address = input.clientIp;
   if (input.userAgent) userData.client_user_agent = input.userAgent;
   if (input.fbp) userData.fbp = input.fbp;
   if (input.fbc) userData.fbc = input.fbc;
-  if (Object.keys(userData).length === 0) return;
+  if (input.emailSha256) userData.em = [input.emailSha256];
+  if (input.phoneSha256) userData.ph = [input.phoneSha256];
+  if (Object.keys(userData).length === 0) {
+    console.warn(`Meta CAPI skipped (empty user_data): Purchase ${input.eventId}`);
+    return;
+  }
 
   const body: Record<string, unknown> = {
     data: [
       {
         event_name: "Purchase",
         event_time: Math.floor(Date.now() / 1000),
-        event_id: input.subscriptionId,
+        event_id: input.eventId,
         action_source: "website",
         event_source_url: input.eventSourceUrl,
         user_data: userData,
@@ -56,7 +87,7 @@ export async function sendPurchaseCapiEvent(input: PurchaseCapiInput): Promise<v
           content_name: input.planId,
           value: input.value,
           currency: "INR",
-          order_id: input.subscriptionId,
+          order_id: input.orderId,
         },
       },
     ],

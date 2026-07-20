@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { getPlanById, SUBSCRIPTION_TOTAL_COUNT } from "@/lib/constants";
 import { RAZORPAY_PLAN_MAP } from "@/lib/razorpay-plans.server";
+import { readCookie } from "@/lib/meta-capi.server";
 
 function getRazorpay() {
   return new Razorpay({
@@ -68,12 +69,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
+    // Stash browser attribution context in subscription notes: Razorpay echoes
+    // them back in every webhook payload, giving the webhook's server-side Meta
+    // Purchase browser-grade match keys (webhooks have no cookies of their own).
+    // Razorpay limits: ≤15 keys, ≤256 chars per value.
+    const cookieHeader = request.headers.get("cookie");
+    const ua = request.headers.get("user-agent") ?? "";
+    const fbp = readCookie(cookieHeader, "_fbp");
+    const fbc = readCookie(cookieHeader, "_fbc");
+    const notes: Record<string, string> = { lp_plan: plan.id };
+    if (ip !== "unknown") notes.lp_ip = ip;
+    if (ua) notes.lp_ua = ua.slice(0, 250);
+    if (fbp && fbp.length <= 255) notes.lp_fbp = fbp;
+    // Omit rather than truncate — a truncated fbc corrupts attribution.
+    if (fbc && fbc.length <= 255) notes.lp_fbc = fbc;
+
     const razorpay = getRazorpay();
     const subscription = await razorpay.subscriptions.create({
       plan_id: razorpayPlanId,
       total_count: SUBSCRIPTION_TOTAL_COUNT,
       quantity: 1,
       customer_notify: 1,
+      notes,
     });
 
     return NextResponse.json({
