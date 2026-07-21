@@ -7,6 +7,9 @@ export type Plan = {
   description: string;
   popular: boolean;
   features: string[];
+  /** Hidden plans are purchasable (checkout, webhook, tracking) but never
+   *  rendered on the public pricing grid. */
+  hidden?: boolean;
 };
 
 export const SUBSCRIPTION_TOTAL_COUNT = 12; // 12 billing cycles (1 year)
@@ -51,6 +54,21 @@ export const PLANS: Plan[] = [
       "50 product photos / social media posts",
       "Priority support",
     ],
+  },
+  // Internal ₹1 plan for verifying Meta pixel/CAPI firing with a real payment.
+  // Reachable only via the unlinked /test-plan page; disabled entirely when
+  // RAZORPAY_PLAN_ID_TEST is unset (create-subscription 400s). Single billing
+  // cycle (see create-subscription total_count).
+  {
+    id: "test",
+    name: "Tracking Test",
+    amount: 100,
+    amountDisplay: "₹1",
+    period: " one-time",
+    description: "Internal ₹1 plan for payment-tracking verification",
+    popular: false,
+    hidden: true,
+    features: ["Internal use only — verifies purchase tracking"],
   },
 ];
 

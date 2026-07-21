@@ -87,7 +87,9 @@ export async function POST(request: Request) {
     const razorpay = getRazorpay();
     const subscription = await razorpay.subscriptions.create({
       plan_id: razorpayPlanId,
-      total_count: SUBSCRIPTION_TOTAL_COUNT,
+      // The ₹1 tracking-test plan charges a single cycle — nothing recurring
+      // to cancel after verification.
+      total_count: plan.id === "test" ? 1 : SUBSCRIPTION_TOTAL_COUNT,
       quantity: 1,
       customer_notify: 1,
       notes,

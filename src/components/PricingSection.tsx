@@ -57,7 +57,7 @@ export default function PricingSection() {
           className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-2xl mx-auto"
           onMouseLeave={() => setHoveredPlanId(null)}
         >
-          {PLANS.map((plan) => {
+          {PLANS.filter((plan) => !plan.hidden).map((plan) => {
             // If nothing is hovered, the popular plan is highlighted
             // If a plan is hovered, only that plan is highlighted
             const isHighlighted =

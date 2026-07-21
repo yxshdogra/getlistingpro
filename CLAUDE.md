@@ -31,6 +31,7 @@ npm start       # Production server on port 3000
 | `/` | Landing page |
 | `/thank-you` | Payment success (after server-verified payment) |
 | `/payment-failed?plan=Y` | Payment failure with retry |
+| `/test-plan` | Unlinked, noindexed internal page — real ₹1 checkout to verify purchase tracking; active only while `RAZORPAY_PLAN_ID_TEST` is set |
 | `/api/create-subscription` | POST — creates Razorpay subscription (stashes attribution context in notes) |
 | `/api/verify-payment` | POST — verifies Razorpay subscription signature (HMAC SHA256) |
 | `/api/razorpay-webhook` | POST — Razorpay `subscription.charged` webhook → server-side Meta Purchase (covers async UPI-AutoPay mandates + renewals the browser pixel never sees) |
@@ -45,6 +46,7 @@ npm start       # Production server on port 3000
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Client-side Razorpay key (same as above) |
 | `RAZORPAY_PLAN_ID_STARTER` | Razorpay plan ID for the Starter ₹499/mo subscription (defines the billed amount) |
 | `RAZORPAY_PLAN_ID_GROWTH` | Razorpay plan ID for the Growth ₹999/mo subscription (defines the billed amount) |
+| `RAZORPAY_PLAN_ID_TEST` | Optional — internal ₹1 single-cycle plan for the `/test-plan` tracking check. Unset = test checkout disabled |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Meta/Facebook Pixel ID |
 | `META_CAPI_ACCESS_TOKEN` | Optional — enables server-side Meta Purchase (Conversions API) from verify-payment and the Razorpay webhook; deduped with the browser pixel via `event_id` (subscription id for the first charge, payment id for renewals). Unset = skips are logged with `console.warn` |
 | `META_CAPI_TEST_EVENT_CODE` | Optional, verification only — routes server CAPI events to Events Manager → Test Events |
