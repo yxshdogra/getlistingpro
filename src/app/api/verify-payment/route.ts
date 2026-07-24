@@ -1,7 +1,6 @@
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getPlanById } from "@/lib/constants";
-import { readCookie, sendPurchaseCapiEvent } from "@/lib/meta-capi.server";
 
 export async function POST(request: Request) {
   try {
@@ -56,22 +55,18 @@ export async function POST(request: Request) {
       // Sanitize subscription ID (returned separately, not in the URL)
       const safeSubscriptionId = razorpay_subscription_id.replace(/[^a-zA-Z0-9_]/g, "");
 
-      // Server-side Purchase (dedupes with the browser pixel via event_id);
-      // after() runs post-response so the redirect is never delayed.
-      const cookieHeader = request.headers.get("cookie");
-      const capiInput = {
-        eventId: safeSubscriptionId,
-        orderId: safeSubscriptionId,
-        planId: plan.id,
-        value: plan.amount / 100,
-        clientIp: request.headers.get("x-forwarded-for")?.split(",")[0].trim(),
-        userAgent: request.headers.get("user-agent") ?? undefined,
-        fbp: readCookie(cookieHeader, "_fbp"),
-        fbc: readCookie(cookieHeader, "_fbc"),
-        eventSourceUrl: origin,
-      };
-      after(() => sendPurchaseCapiEvent(capiInput));
-
+      // No server-side Purchase is fired here on purpose. The
+      // subscription.charged webhook is the authoritative server event and its
+      // payload is a strict superset of anything this route can build: it
+      // carries the same fbp/fbc/ip/ua (stashed into subscription notes at
+      // creation) PLUS hashed email and phone from the payment object.
+      //
+      // Firing here as well was worse than redundant. Both used
+      // event_id = subscription_id, and Meta keeps the FIRST event it receives
+      // for an id — so this route, which runs immediately and has no hashed
+      // identifiers, reliably beat the webhook and threw away the better match
+      // data. The browser pixel on /thank-you still provides the instant
+      // client-side signal.
       return NextResponse.json({
         verified: true,
         planId: plan.id,
